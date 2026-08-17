@@ -1,0 +1,14 @@
+# Source-of-truth specification documents — left exactly as authored.
+REQUIREMENTS.md
+ROADMAP.md
+
+node_modules
+dist
+.expo
+ios
+android
+package-lock.json
+expo-env.d.ts
+
+# Generated from the Supabase schema by `npm run types:generate`
+src/lib/database.types.ts
