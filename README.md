@@ -3,7 +3,8 @@
 Internal React Native app for A1A field representatives. See
 [`REQUIREMENTS.md`](./REQUIREMENTS.md) for what it does and
 [`ROADMAP.md`](./ROADMAP.md) for the build plan. Currently in **Phase 0 —
-Foundations**.
+Foundations**, with a full-coverage layout prototype in front of it — see
+**Prototype preview** below.
 
 > **No PHI.** This app must never store, transmit, or display protected health
 > information. See requirements §1.4.
@@ -15,16 +16,67 @@ Foundations**.
 ```bash
 nvm use                 # Node 24.11.1, pinned in .nvmrc
 npm install
+npm run web             # the clickable layout prototype, at http://localhost:8081
+```
+
+`npm run web` needs no `.env` and no backend — see **Prototype preview** below.
+
+For the phone build:
+
+```bash
 cp .env.example .env    # then fill in real values — see SETUP.md
 npm start
 ```
 
-Running the app requires a **custom EAS development client**, not Expo Go — the
-PDF viewer is a native module (requirements §8.1). Build instructions land in
+Running on a device requires a **custom EAS development client**, not Expo Go —
+the PDF viewer is a native module (requirements §8.1). Build instructions land in
 Checkpoint 6.
 
 Full backend setup (Supabase project, migrations, first admin user) is in
 `SETUP.md`, added in Checkpoint 2.
+
+---
+
+## Prototype preview
+
+`npm run web` serves a complete, clickable version of all four functional areas
+for layout review, ahead of the backend. It is the same code the phone build
+runs: every screen is React Native primitives, rendered through
+`react-native-web`. Nothing in it is throwaway web work.
+
+**What is real:** navigation, every screen and state, the permission differences
+between Admin and Standard, form validation, the preference-card revision log,
+and the concurrency-conflict flow (FR-PREF-13).
+
+**What is stubbed:** there is no network. Data is seeded in memory
+(`src/lib/mock/data.ts`) and resets on reload. The PDF and image viewers are
+chrome around a placeholder, because `react-native-pdf` is a native module with
+no web build (§8.1). Uploads show real progress against a fake transfer.
+
+The browser shows the app inside a phone frame with a review panel beside it:
+
+- **View as** — switch between Admin and Standard. The §2.2 permission matrix
+  changes what appears on nearly every screen, and both need reviewing.
+- **Simulate offline** — shows the non-blocking banner from §3.
+
+A few prototype-only affordances are marked as such in the UI: "Simulate someone
+else saving first" on the preference card editor, and the oversized-file and
+failed-upload entries in the Documents upload sheet. They exist so the error and
+conflict paths can be reviewed without a second device or a flaky connection.
+
+The seed data contains **no PHI** and deliberately models the §1.4 boundary:
+hospitals, surgeons, and how to work with them — never a patient or a case.
+
+### Open questions this prototype takes a position on
+
+The prototype had to resolve the open questions in requirements §9 to render a
+screen at all. These are choices to react to, not decisions:
+
+| #   | Question                      | What the prototype does                                                                                                                     |
+| --- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Admin-only announcements?     | **No** — any user can post; only admins pin, and only authors or admins edit and delete.                                                    |
+| Q2  | Admin-only document deletion? | **No** — users manage their own uploads and folders; admins manage anything. The typed confirmation on a non-empty folder is the guardrail. |
+| Q4  | Real category names?          | Ships Red / Green / Blue, plus an admin screen that renames and recolours them without a release.                                           |
 
 ## Scripts
 
@@ -52,6 +104,17 @@ Full backend setup (Supabase project, migrations, first admin user) is in
 Routes live in `app/`; everything else lives in `src/` behind the `@/` alias.
 The full convention, including the import-direction rules, is documented in
 [`src/README.md`](./src/README.md).
+
+Two directories are prototype scaffolding with a defined replacement:
+
+| Now                                                  | Becomes                                                                  |
+| ---------------------------------------------------- | ------------------------------------------------------------------------ |
+| `src/lib/mock/` — seeded data and an in-memory store | Supabase client + TanStack Query hooks under each `features/<area>/api/` |
+| `src/lib/storage.ts` — `localStorage` shim           | `expo-secure-store` for the session, async storage for preferences       |
+
+`src/stores/` uses React context rather than Zustand for now, to keep the
+prototype dependency-free. The hook signatures (`useSession`, `useUiPrefs`) are
+what the Zustand versions will expose, so no screen changes when they land.
 
 ## Configuration and secrets
 

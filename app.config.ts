@@ -51,7 +51,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     name,
     slug: 'a1a-field-app',
     version: '0.1.0',
-    platforms: ['ios', 'android'], // requirements §1.3 — no web target
+    // requirements §1.3 excludes a web target from v1. 'web' is present only to
+    // host the clickable layout prototype (see README "Prototype preview") — the
+    // screens are built from React Native primitives so nothing here is
+    // web-specific work that has to be redone for the phone build.
+    platforms: ['ios', 'android', 'web'],
     orientation: 'portrait', // requirements §3 — portrait only
     icon: './assets/images/icon.png',
     // URL scheme for auth deep links (invite / password-reset emails).
@@ -65,6 +69,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ios: {
       bundleIdentifier: bundleId,
       supportsTablet: false, // requirements §1.3 — phone only
+    },
+    web: {
+      bundler: 'metro',
+      output: 'single', // single-page app; the prototype has no server routes
+      favicon: './assets/images/icon.png',
     },
     android: {
       package: bundleId,
