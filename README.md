@@ -32,8 +32,8 @@ Running on a device requires a **custom EAS development client**, not Expo Go �
 the PDF viewer is a native module (requirements §8.1). Build instructions land in
 Checkpoint 6.
 
-Full backend setup (Supabase project, migrations, first admin user) is in
-`SETUP.md`, added in Checkpoint 2.
+Full backend setup — local Supabase, hosted projects, migrations, type
+generation, and the first admin user — is in [`SETUP.md`](./SETUP.md).
 
 ---
 
