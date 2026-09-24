@@ -87,6 +87,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     plugins: [
       'expo-router',
+      // Keychain / Keystore for the auth refresh token (requirements §2.3).
+      'expo-secure-store',
       [
         'expo-splash-screen',
         {
